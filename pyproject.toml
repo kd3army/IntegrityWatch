@@ -1,0 +1,26 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "integritywatch"
+version = "0.1.0"
+description = "A small file integrity monitor that detects unauthorized changes to files."
+readme = "README.md"
+requires-python = ">=3.8"
+license = { text = "MIT" }
+authors = [{ name = "KUYA PITER" }]
+keywords = ["security", "file-integrity", "fim", "monitoring", "sha256"]
+classifiers = [
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Operating System :: POSIX :: Linux",
+    "Topic :: Security",
+    "Environment :: Console",
+]
+
+[project.scripts]
+integritywatch = "integritywatch.cli:main"
+
+[tool.setuptools]
+packages = ["integritywatch"]
