@@ -160,7 +160,7 @@ exit code: 2
 
 ## Screenshots
 
-### Automated tests (42 passing)
+### Automated tests (74 passing)
 ![Tests](docs/screenshots/01_tests.png)
 
 ### Creating a baseline of the real system
@@ -187,6 +187,9 @@ exit code: 2
 ### Monitoring root-only files with sudo
 ![Root files](docs/screenshots/09_root_critical_files.png)
 
+### Test coverage
+![Coverage report](docs/screenshots/10_coverage.png)
+
 ## How it works
 ```
 integritywatch/
@@ -206,7 +209,7 @@ integritywatch/
 pip install pytest
 python3 -m pytest -v
 ```
-42 tests pass (2.59 s on my machine). They cover the scanner, baseline storage, comparison logic, warning handling, and end-to-end runs of the real command line. Unit tests use temporary files so they are repeatable. All the real-system results above come from the live machine.
+74 tests pass (2.06 s on my machine). They cover the scanner, baseline storage, comparison logic, warning handling, and end-to-end runs of the real command line. Unit tests use temporary files so they are repeatable. All the real-system results above come from the live machine. Measured coverage: **97%** (line and branch, measured with pytest-cov).
 
 ## Challenges faced
 - **A wall of warnings.** Scanning `/etc` as a normal user produced 84 permission warnings, which flooded the terminal and exposed private file names such as saved Wi-Fi profiles. Warnings are now summarized (the first 3, plus a count), and `-v` shows everything.
