@@ -1,6 +1,7 @@
 # IntegrityWatch
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![tests](https://github.com/kd3army/IntegrityWatch/actions/workflows/tests.yml/badge.svg)](https://github.com/kd3army/IntegrityWatch/actions)
 
 A small command-line **file integrity monitor** written in Python. It records a trusted snapshot (a *baseline*) of your files, then tells you exactly what changed afterwards: modified content, changed permissions or ownership, deleted files and new files.
 
