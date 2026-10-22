@@ -1,20 +1,29 @@
 """Compare two snapshots (baseline vs. current) and describe what changed."""
 
+from __future__ import annotations
+
+from collections.abc import Collection
+
+from .scanner import Entries
+
 CATEGORIES = ("modified", "permissions", "owner", "deleted", "new")
 
+# change category -> list of {"path": ..., "detail": ...}
+Changes = dict[str, list[dict[str, str]]]
 
-def _mode(value):
+
+def _mode(value: int) -> str:
     """Format a numeric permission mode like 0644."""
     return f"{value:04o}"
 
 
-def compare(old, new, unreadable=()):
+def compare(old: Entries, new: Entries, unreadable: Collection[str] = ()) -> Changes:
     """Return a dict of change lists: modified, permissions, owner, deleted, new.
 
     old, new:   dicts of path -> metadata
     unreadable: paths that could not be read now; they are not reported as deleted
     """
-    changes = {name: [] for name in CATEGORIES}
+    changes: Changes = {name: [] for name in CATEGORIES}
 
     for path in sorted(old):
         if path not in new:
@@ -59,6 +68,6 @@ def compare(old, new, unreadable=()):
     return changes
 
 
-def total_changes(changes):
+def total_changes(changes: Changes) -> int:
     """Return the total number of changes across all categories."""
     return sum(len(items) for items in changes.values())

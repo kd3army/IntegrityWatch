@@ -27,3 +27,17 @@ packages = ["integritywatch"]
 
 [tool.setuptools.dynamic]
 version = { attr = "integritywatch.__version__" }
+
+[tool.ruff]
+line-length = 100
+target-version = "py39"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP"]
+
+[tool.coverage.run]
+source = ["integritywatch"]
+branch = true
+
+[tool.coverage.report]
+show_missing = true

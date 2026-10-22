@@ -1,8 +1,14 @@
 """Baseline storage: save and load the snapshot of file metadata as JSON."""
 
+from __future__ import annotations
+
 import datetime
 import json
 import os
+from collections.abc import Sequence
+from typing import Any
+
+from .scanner import Entries
 
 BASELINE_VERSION = 1
 
@@ -11,7 +17,9 @@ class BaselineError(Exception):
     """Raised when a baseline cannot be written, read or understood."""
 
 
-def save_baseline(path, entries, paths, excludes):
+def save_baseline(
+    path: str, entries: Entries, paths: Sequence[str], excludes: Sequence[str]
+) -> None:
     """Write the baseline to `path` as JSON.
 
     entries:  dict of file path -> metadata (from scanner.scan_paths)
@@ -33,20 +41,20 @@ def save_baseline(path, entries, paths, excludes):
             json.dump(data, f, indent=2, sort_keys=True)
         os.replace(tmp, path)  # atomic: a crash never leaves a half-written baseline
     except OSError as err:
-        raise BaselineError(f"cannot write baseline {path}: {err.strerror or err}")
+        raise BaselineError(f"cannot write baseline {path}: {err.strerror or err}") from err
 
 
-def load_baseline(path):
+def load_baseline(path: str) -> dict[str, Any]:
     """Read and validate a baseline file. Return it as a dict."""
     try:
         with open(path) as f:
             data = json.load(f)
     except FileNotFoundError:
-        raise BaselineError(f"baseline not found: {path} (run 'init' first)")
+        raise BaselineError(f"baseline not found: {path} (run 'init' first)") from None
     except PermissionError:
-        raise BaselineError(f"no permission to read baseline: {path}")
+        raise BaselineError(f"no permission to read baseline: {path}") from None
     except json.JSONDecodeError:
-        raise BaselineError(f"baseline is not valid JSON: {path}")
+        raise BaselineError(f"baseline is not valid JSON: {path}") from None
 
     if not isinstance(data, dict) or data.get("version") != BASELINE_VERSION:
         raise BaselineError(f"unsupported baseline format: {path}")

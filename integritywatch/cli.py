@@ -3,17 +3,21 @@
 Exit codes:  0 = no changes   1 = changes detected   2 = error
 """
 
+from __future__ import annotations
+
 import argparse
 import datetime
 import json
 import os
 import sys
 import time
+from collections.abc import Sequence
+from typing import Any
 
 from . import __version__
 from .baseline import BaselineError, load_baseline, save_baseline
-from .compare import compare, total_changes
-from .scanner import scan_paths
+from .compare import Changes, compare, total_changes
+from .scanner import Entries, scan_paths
 
 DEFAULT_BASELINE = "baseline.json"
 
@@ -28,7 +32,7 @@ LABELS = {
 MAX_WARNINGS = 3  # warnings shown by default before the rest are summarized
 
 
-def format_warnings(errors, verbose=False):
+def format_warnings(errors: Sequence[str], verbose: bool = False) -> list[str]:
     """Return warning lines. Long lists are shortened unless verbose is True."""
     lines = [f"[WARNING] {err}" for err in errors]
     if verbose or len(lines) <= MAX_WARNINGS:
@@ -39,13 +43,13 @@ def format_warnings(errors, verbose=False):
     ]
 
 
-def print_warnings(errors, verbose=False):
+def print_warnings(errors: Sequence[str], verbose: bool = False) -> None:
     """Print scan warnings to stderr."""
     for line in format_warnings(errors, verbose):
         print(line, file=sys.stderr)
 
 
-def cmd_init(args):
+def cmd_init(args: argparse.Namespace) -> int:
     """Scan the given paths and save a new baseline."""
     # never include the baseline file itself in the scan
     excludes = list(args.exclude) + [os.path.abspath(args.baseline)]
@@ -66,7 +70,9 @@ def cmd_init(args):
     return 0
 
 
-def scan_and_compare(data, baseline_path):
+def scan_and_compare(
+    data: dict[str, Any], baseline_path: str
+) -> tuple[Entries, Changes, list[str], set[str]]:
     """Scan the monitored paths and compare with the baseline.
 
     Returns (entries, changes, errors, unreadable).
@@ -80,7 +86,7 @@ def scan_and_compare(data, baseline_path):
     return entries, changes, errors, unreadable
 
 
-def cmd_check(args):
+def cmd_check(args: argparse.Namespace) -> int:
     """Compare the current state against the saved baseline."""
     data = load_baseline(args.baseline)
     _entries, changes, errors, _unreadable = scan_and_compare(data, args.baseline)
@@ -96,7 +102,7 @@ def cmd_check(args):
     return 1 if count else 0
 
 
-def cmd_update(args):
+def cmd_update(args: argparse.Namespace) -> int:
     """Accept the current state of the files as the new baseline."""
     data = load_baseline(args.baseline)
     entries, changes, errors, unreadable = scan_and_compare(data, args.baseline)
@@ -128,7 +134,7 @@ def cmd_update(args):
     return 0
 
 
-def cmd_watch(args):
+def cmd_watch(args: argparse.Namespace) -> int:
     """Check repeatedly and alert when something changes."""
     if args.interval <= 0:
         print("[ERROR] --interval must be greater than 0", file=sys.stderr)
@@ -138,7 +144,7 @@ def cmd_watch(args):
     print(f"[*] Watching {len(data['files'])} files every {args.interval:g}s. "
           "Press Ctrl+C to stop.")
 
-    last_alert = None   # remember the last alert so we do not repeat it every cycle
+    last_alert: str | None = None  # remember the last alert so we do not repeat it
     checks = 0
     try:
         while True:
@@ -167,7 +173,9 @@ def cmd_watch(args):
     return 1 if last_alert is not None else 0
 
 
-def print_text_report(baseline_path, data, changes, count):
+def print_text_report(
+    baseline_path: str, data: dict[str, Any], changes: Changes, count: int
+) -> None:
     """Print a human-readable report of the changes."""
     print("=" * 46)
     print(" INTEGRITYWATCH CHECK")
@@ -181,10 +189,13 @@ def print_text_report(baseline_path, data, changes, count):
     print("-" * 46)
     summary = "  ".join(f"{name.capitalize()}: {len(items)}" for name, items in changes.items())
     print(summary)
-    print("[WARNING] Changes detected!" if count else "[OK] No changes. All files match the baseline.")
+    if count:
+        print("[WARNING] Changes detected!")
+    else:
+        print("[OK] No changes. All files match the baseline.")
 
 
-def build_parser():
+def build_parser() -> argparse.ArgumentParser:
     """Create the argument parser with its subcommands."""
     parser = argparse.ArgumentParser(
         prog="integritywatch",
@@ -232,7 +243,7 @@ def build_parser():
     return parser
 
 
-def main(argv=None):
+def main(argv: Sequence[str] | None = None) -> int:
     """Run the CLI and return an exit code."""
     parser = build_parser()
     args = parser.parse_args(argv)
