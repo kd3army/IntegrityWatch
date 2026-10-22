@@ -1,0 +1,4 @@
+# Example only: check files every 15 minutes and log any changes.
+# `check -q` prints nothing when clean and exits with 1 when changes are found.
+# Adjust the paths, and run `integritywatch init` first to create the baseline.
+*/15 * * * * cd /path/to/baseline-folder && integritywatch check -q >> /var/log/integritywatch.log 2>&1
