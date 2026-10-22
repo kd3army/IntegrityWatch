@@ -32,7 +32,7 @@ integritywatch --help
 ```
 You can also run it without installing: `python3 -m integritywatch --help`.
 
-Requires Python 3.8+ (developed and tested on Python 3.14.7, Kali Linux).
+Requires Python 3.9+ (developed and tested on Python 3.14.7, Kali Linux).
 
 ## Usage
 
@@ -150,7 +150,11 @@ exit code: 0
 
 ### Error handling
 ```
-PASTE_ERRORS_OUTPUT_HERE
+[ERROR] baseline not found: missing.json (run 'init' first)
+exit code: 2
+[WARNING] /nonexistent: no such file or directory
+[ERROR] no files found to record
+exit code: 2
 ```
 
 ## Screenshots
@@ -170,7 +174,7 @@ PASTE_ERRORS_OUTPUT_HERE
 ### JSON output
 ![JSON output](docs/screenshots/05_check_json.png)
 
-### Error handling
+### Error handling (screenshot)
 ![Errors](docs/screenshots/06_errors.png)
 
 ### Watch mode
