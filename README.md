@@ -209,7 +209,7 @@ integritywatch/
 pip install pytest
 python3 -m pytest -v
 ```
-74 tests pass (2.06 s on my machine). They cover the scanner, baseline storage, comparison logic, warning handling, and end-to-end runs of the real command line. Unit tests use temporary files so they are repeatable. All the real-system results above come from the live machine. Measured coverage: **97%** (line and branch, measured with pytest-cov).
+74 tests pass (2.06 s on my machine). They cover the scanner, baseline storage, comparison logic, warning handling, and end-to-end runs of the real command line. Unit tests use temporary files so they are repeatable. All the real-system results above come from the live machine. Measured coverage: **100%** (line and branch, measured with pytest-cov).
 
 ## Challenges faced
 - **A wall of warnings.** Scanning `/etc` as a normal user produced 84 permission warnings, which flooded the terminal and exposed private file names such as saved Wi-Fi profiles. Warnings are now summarized (the first 3, plus a count), and `-v` shows everything.
